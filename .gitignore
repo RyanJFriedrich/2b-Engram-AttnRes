@@ -5,6 +5,7 @@
 /*
 !/train/
 !/.gitignore
+!/README.md
 
 # Inside train/: no run outputs, data drop zones, or caches
 # (README placeholders stay tracked).
