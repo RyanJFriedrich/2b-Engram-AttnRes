@@ -87,6 +87,7 @@ class SWAConfig:
 
     window: int = 4096
     rope_theta: float = 10000.0
+    pattern: Optional[list[dict[str, Any]]] = None  # optional sublayer [{window, rope_theta}, ...]
     rope_theta_warmstart_anneal: Optional[AnnealConfig] = None  # 500k -> 10k, log-space
     sink: SinkConfig = None  # type: ignore[assignment]
     window_anneal: Optional[AnnealConfig] = None
@@ -98,13 +99,16 @@ class SWAConfig:
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "SWAConfig":
         _reject_unknown(
-            d, {"window", "rope_theta", "rope_theta_warmstart_anneal", "sink", "window_anneal"}, "swa"
+            d,
+            {"window", "rope_theta", "pattern", "rope_theta_warmstart_anneal", "sink", "window_anneal"},
+            "swa",
         )
         anneal = d.get("rope_theta_warmstart_anneal")
         win_anneal = d.get("window_anneal")
         return cls(
             window=d.get("window", 4096),
             rope_theta=d.get("rope_theta", 10000.0),
+            pattern=d.get("pattern"),
             rope_theta_warmstart_anneal=(
                 AnnealConfig.from_dict(anneal, "swa.rope_theta_warmstart_anneal") if anneal else None
             ),
@@ -116,6 +120,8 @@ class SWAConfig:
 
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {"window": self.window, "rope_theta": self.rope_theta}
+        if self.pattern is not None:
+            d["pattern"] = self.pattern
         if self.rope_theta_warmstart_anneal is not None:
             d["rope_theta_warmstart_anneal"] = self.rope_theta_warmstart_anneal.to_dict()
         d["sink"] = self.sink.to_dict()
@@ -135,25 +141,32 @@ class GlobalConfig:
     rope_type: str = "prope"
     rope_fraction: float = 0.25
     rope_theta: float = 1000000.0
+    block_thetas: Optional[list[float]] = None  # optional per-block theta list
     qk_norm: bool = False  # LOCKED off for GLOBAL/GATHER (spec §3.2)
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "GlobalConfig":
-        _reject_unknown(d, {"rope_type", "rope_fraction", "rope_theta", "qk_norm"}, "global")
+        _reject_unknown(
+            d, {"rope_type", "rope_fraction", "rope_theta", "block_thetas", "qk_norm"}, "global"
+        )
         return cls(
             rope_type=d.get("rope_type", "prope"),
             rope_fraction=d.get("rope_fraction", 0.25),
             rope_theta=d.get("rope_theta", 1000000.0),
+            block_thetas=d.get("block_thetas"),
             qk_norm=d.get("qk_norm", False),
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d: dict[str, Any] = {
             "rope_type": self.rope_type,
             "rope_fraction": self.rope_fraction,
             "rope_theta": self.rope_theta,
             "qk_norm": self.qk_norm,
         }
+        if self.block_thetas is not None:
+            d["block_thetas"] = self.block_thetas
+        return d
 
 
 @dataclass
@@ -432,6 +445,22 @@ class ModelConfig:
             raise ValueError("head_dim * num_attention_heads must equal hidden_size")
         if self.swa.window <= 0:
             raise ValueError("swa.window must be positive")
+        if self.swa.pattern is not None:
+            if not isinstance(self.swa.pattern, list) or len(self.swa.pattern) == 0:
+                raise ValueError("swa.pattern must be a non-empty list")
+            for idx, item in enumerate(self.swa.pattern):
+                if not isinstance(item, dict) or "window" not in item or "rope_theta" not in item:
+                    raise ValueError(f"swa.pattern[{idx}] must contain 'window' and 'rope_theta'")
+                if item["window"] <= 0:
+                    raise ValueError(f"swa.pattern[{idx}].window must be positive")
+                if item["rope_theta"] <= 0:
+                    raise ValueError(f"swa.pattern[{idx}].rope_theta must be positive")
+        if self.global_.block_thetas is not None:
+            if not isinstance(self.global_.block_thetas, list) or len(self.global_.block_thetas) == 0:
+                raise ValueError("global.block_thetas must be a non-empty list")
+            for idx, th in enumerate(self.global_.block_thetas):
+                if th <= 0:
+                    raise ValueError(f"global.block_thetas[{idx}] must be positive")
         if self.attn_query_chunk < 0:
             raise ValueError("attn_query_chunk must be >= 0 (0 = unchunked)")
         if self.swa.sink.type not in VALID_SINK_TYPES:

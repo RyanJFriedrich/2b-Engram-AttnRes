@@ -1,0 +1,8 @@
+{
+  "scheme": "nfkc+casefold,min-id-representative",
+  "sha256": "8bb4fa0dff964ec53035255a27c3dc6b635a4709aabda449105828ad4c6409ad",
+  "vocab": 100278,
+  "canon_vocab": 75869,
+  "merged": 24409,
+  "empty_canon_class_size": 0
+}

@@ -1,0 +1,35 @@
+# Training run config for OLMo-2B (spec v3.0 fork)
+# Architecture: 41 layers, d_model=2048, d_ff=7168, 16 Q heads, 4 KV heads
+# Cold-start interior + SVD down-projected furniture embeddings (frozen)
+model: train/configs/model/olmo_2b_v1.yaml
+data_shards: []            # fill with converted shards
+seq_len: 8192
+shuffle: true
+data_seed: 0
+
+steps: 12735
+batch_size: 1
+grad_accum: 4
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 20
+cosine_steps: 200
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+loss_chunk_size: 512
+
+bf16: true
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+out_dir: train/runs/real_olmo_2b_v1
+checkpoint_every: 100
+log_every: 5

@@ -78,10 +78,11 @@ class RefitAttention(nn.Module):
     (q_proj/k_proj/v_proj/o_proj) so the donor warm start is an identity map.
     """
 
-    def __init__(self, cfg: ModelConfig, layer_type: str) -> None:
+    def __init__(self, cfg: ModelConfig, layer_type: str, layer_idx: int = 0) -> None:
         super().__init__()
         assert cfg.swa is not None and cfg.global_ is not None and cfg.gather is not None
         self.layer_type = layer_type
+        self.layer_idx = layer_idx
         self.num_heads = cfg.num_attention_heads
         self.num_kv_heads = cfg.num_key_value_heads
         self.head_dim = cfg.head_dim
@@ -105,21 +106,40 @@ class RefitAttention(nn.Module):
         self.probe: Optional[Any] = None
 
         if layer_type == "swa":
+            window = cfg.swa.window
+            theta = cfg.swa.rope_theta
+            if cfg.swa.pattern:
+                swa_in_block = 0
+                if cfg.layer_types:
+                    for j in range(layer_idx - 1, -1, -1):
+                        if cfg.layer_types[j] == "swa":
+                            swa_in_block += 1
+                        else:
+                            break
+                pat_idx = swa_in_block % len(cfg.swa.pattern)
+                p = cfg.swa.pattern[pat_idx]
+                window = p.get("window", window)
+                theta = p.get("rope_theta", theta)
             # Bare final theta from construction (spec §3.2); the warm-start
             # anneal ablation re-interpolates via set_anneal_state.
-            self.rotary = RotaryEmbedding(cfg.head_dim, theta=cfg.swa.rope_theta)
+            self.rotary = RotaryEmbedding(cfg.head_dim, theta=theta)
             # Learned per-head sink logit (spec §3.2). Init -10: e^-10 ~ 4.5e-5
             # relative on the softmax denominator — a near-no-op at init (I4).
             self.sink_logit = nn.Parameter(torch.full((self.num_heads,), cfg.swa.sink.init))
-            self.window: Optional[int] = cfg.swa.window  # None = full sequence (ablation)
+            self.base_window: Optional[int] = window
+            self.window: Optional[int] = window
         elif layer_type == "global":
+            theta = cfg.global_.rope_theta
+            if cfg.global_.block_thetas and cfg.layer_types:
+                global_idx = sum(1 for j in range(layer_idx) if cfg.layer_types[j] == "global")
+                if global_idx < len(cfg.global_.block_thetas):
+                    theta = cfg.global_.block_thetas[global_idx]
             self.rotary = PartialRotaryEmbedding(
-                cfg.head_dim, cfg.global_.rope_fraction, cfg.global_.rope_theta
+                cfg.head_dim, cfg.global_.rope_fraction, theta
             )
         elif layer_type == "gather":
             # Same p-RoPE family as the globals (spec §3.3: uniform
-            # positional scheme); identity init makes the layer an exact
-            # no-op at init regardless (spec §3.4).
+            # positional scheme).
             self.rotary = PartialRotaryEmbedding(
                 cfg.head_dim, cfg.gather.rope_fraction, cfg.gather.rope_theta
             )
@@ -233,10 +253,11 @@ class RefitDecoderLayer(nn.Module):
     """Same shapes as the donor layer (spec §3.1: layers differ only in
     attention masking and position encoding, never projection shapes)."""
 
-    def __init__(self, cfg: ModelConfig, layer_type: str) -> None:
+    def __init__(self, cfg: ModelConfig, layer_type: str, layer_idx: int = 0) -> None:
         super().__init__()
         self.layer_type = layer_type
-        self.self_attn = RefitAttention(cfg, layer_type)
+        self.layer_idx = layer_idx
+        self.self_attn = RefitAttention(cfg, layer_type, layer_idx)
         self.mlp = LlamaMLP(cfg)  # type: ignore[arg-type]  # LlamaBaseConfig-duck-typed
         self.input_layernorm = LlamaRMSNorm(cfg.hidden_size, cfg.rms_norm_eps)
         self.post_attention_layernorm = LlamaRMSNorm(cfg.hidden_size, cfg.rms_norm_eps)
@@ -260,7 +281,7 @@ class RefitModel(nn.Module):
         self.model = nn.Module()
         self.model.embed_tokens = nn.Embedding(cfg.vocab_size, cfg.hidden_size)
         self.model.layers = nn.ModuleList(
-            [RefitDecoderLayer(cfg, t) for t in self.layer_types]
+            [RefitDecoderLayer(cfg, t, i) for i, t in enumerate(self.layer_types)]
         )
         self.model.norm = LlamaRMSNorm(cfg.hidden_size, cfg.rms_norm_eps)
         self.lm_head = nn.Linear(cfg.hidden_size, cfg.vocab_size, bias=False)
@@ -331,8 +352,16 @@ class RefitModel(nn.Module):
         for layer in self.model.layers:
             attn = layer.self_attn
             if attn.layer_type == "swa":
-                attn.window = window
-                if self._swa_theta_annealed:
+                if window is None:
+                    attn.window = None
+                elif self.refit_config.swa.pattern and window == self.refit_config.swa.window:
+                    attn.window = getattr(attn, "base_window", window)
+                else:
+                    attn.window = window
+        if self._swa_theta_annealed:
+            for layer in self.model.layers:
+                attn = layer.self_attn
+                if attn.layer_type == "swa":
                     attn.set_theta_progress(theta_progress, self._swa_inv_start, self._swa_inv_final)
 
     def _mask_for(self, layer_type: str, window: Optional[int], seq_len: int,
@@ -389,10 +418,14 @@ class RefitModel(nn.Module):
             capture.setdefault("attn_res_sources", {})
 
         # Per-layer-type masks (computed once per forward).
-        masks: dict[tuple[str, Optional[int]], torch.Tensor] = {}
-        for t in ("swa", "global", "gather"):
-            w = self.anneal_state["window"] if t == "swa" else None
-            masks[(t, w)] = self._mask_for(t, w, seq_len, dtype, device)
+        unique_masks = {
+            (l.self_attn.layer_type, l.self_attn.window if l.self_attn.layer_type == "swa" else None)
+            for l in self.model.layers
+        }
+        masks: dict[tuple[str, Optional[int]], torch.Tensor] = {
+            k: self._mask_for(k[0], k[1], seq_len, dtype, device)
+            for k in unique_masks
+        }
 
         # AttnRes delta-sum bookkeeping (spec §3.5).
         blocks: list[torch.Tensor] = [h]  # blocks[0] = embedding output e

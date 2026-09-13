@@ -11,13 +11,26 @@ from train.src.model.refit import RefitModel
 DEV_TINY = "train/configs/model/dev_tiny.yaml"
 
 
-def test_preflight_checks_structure_and_dev_box():
+def test_preflight_checks_structure_and_dev_box(tmp_path):
     """run_checks returns PASS/FAIL tuples; at dev-box thresholds everything
     that can pass here does (donor weights, canon sha, torch build)."""
-    from train.scripts.preflight import run_checks
+    import json
+    from train.scripts.preflight import check_weights, run_checks
+
+    donor_dir = Path("OriginalModel")
+    ok_weights, _ = check_weights(donor_dir)
+    if not ok_weights:
+        donor_dir = tmp_path / "donor"
+        donor_dir.mkdir()
+        (donor_dir / "config.json").write_text("{}")
+        (donor_dir / "tokenizer.json").write_text("{}")
+        (donor_dir / "model.safetensors.index.json").write_text(
+            json.dumps({"weight_map": {"foo": "model-00001.safetensors"}})
+        )
+        (donor_dir / "model-00001.safetensors").write_bytes(b"0" * 1024)
 
     results = run_checks(
-        Path("OriginalModel"),
+        donor_dir,
         Path("train/configs/model/llama_8bpp_v1.yaml"),
         min_vram_gb=1.0, min_disk_gb=1.0, min_ram_gb=1.0,
     )
