@@ -50,3 +50,17 @@ Interrogate / Ingest  →  Raw JSONL  →  Format & Mask  →  Score (Top-K)  �
 ### Mixing Constraints
 - Every training batch must maintain **$\ge 70\%$ bulk rehearsal** to prevent catastrophic forgetting.
 - Shards must include sidecar metadata (`metadata.json`) declaring `text_source`, `tokenizer_version`, `fold_version`, and `data_class`.
+
+---
+
+## 4. Dataset Distribution via Hugging Face
+
+Completed top-k shards are synced to [`Ouroboros-Research/Our1-2b-Dataset`](https://huggingface.co/datasets/Ouroboros-Research/Our1-2b-Dataset) manually:
+
+```bash
+# Push shards to Hub:
+huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/shards . --repo-type dataset
+
+# Pull shards on training nodes:
+huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/shards --repo-type dataset
+```

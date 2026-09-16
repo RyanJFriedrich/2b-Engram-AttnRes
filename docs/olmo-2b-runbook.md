@@ -103,3 +103,54 @@ python -m train.scripts.train_phase0 \
    ```bash
    python -m pytest train/tests -v
    ```
+
+---
+
+## 5. Hugging Face Hub Operations (Manual)
+
+All heavy models and dataset shards are tracked off-git via Hugging Face.
+
+### Authentication
+```bash
+huggingface-cli login
+```
+
+### Model Checkpoint (`Ouroboros-Research/Our1-2b`)
+
+- **Upload Base Checkpoint to Hub:**
+  ```bash
+  huggingface-cli upload Ouroboros-Research/Our1-2b exports/olmo-2b-base-v1 . --repo-type model
+  ```
+  *Alternative (Python one-liner):*
+  ```bash
+  python -c "from huggingface_hub import HfApi; HfApi().upload_folder(repo_id='Ouroboros-Research/Our1-2b', folder_path='exports/olmo-2b-base-v1', repo_type='model')"
+  ```
+
+- **Download Base Checkpoint (on remote server / GPU node):**
+  ```bash
+  huggingface-cli download Ouroboros-Research/Our1-2b --local-dir exports/olmo-2b-base-v1 --repo-type model
+  ```
+  *Alternative (Python one-liner):*
+  ```bash
+  python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Ouroboros-Research/Our1-2b', local_dir='exports/olmo-2b-base-v1', repo_type='model')"
+  ```
+
+### Dataset Shards (`Ouroboros-Research/Our1-2b-Dataset`)
+
+- **Upload Shards to Hub:**
+  ```bash
+  huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/shards . --repo-type dataset
+  ```
+  *Alternative (Python one-liner):*
+  ```bash
+  python -c "from huggingface_hub import HfApi; HfApi().upload_folder(repo_id='Ouroboros-Research/Our1-2b-Dataset', folder_path='data_pipeline/shards', repo_type='dataset')"
+  ```
+
+- **Download Shards (on remote server / GPU node):**
+  ```bash
+  huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/shards --repo-type dataset
+  ```
+  *Alternative (Python one-liner):*
+  ```bash
+  python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Ouroboros-Research/Our1-2b-Dataset', local_dir='data_pipeline/shards', repo_type='dataset')"
+  ```
