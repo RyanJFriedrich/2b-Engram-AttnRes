@@ -10,6 +10,7 @@ LOG_FILE="/home/ophidian/vllm.log"
 HEALTH_URL="http://127.0.0.1:8000/health"
 CHECK_INTERVAL_SEC=10
 FAULT_PATTERN="dxgkio_make_resident: Ioctl failed: -12"
+STARTUP_TIMEOUT_SEC=300   # Allow up to 5 minutes for GGUF dequantization & KV initialization
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [Watchdog] $*"
@@ -36,28 +37,38 @@ start_server() {
     log "Starting vLLM server via $START_SCRIPT (logging to $LOG_FILE)..."
     nohup bash "$START_SCRIPT" > "$LOG_FILE" 2>&1 &
     VLLM_PID=$!
-    log "vLLM spawned (PID: $VLLM_PID). Waiting for model initialization (up to 90s)..."
+    log "vLLM spawned (PID: $VLLM_PID). Waiting for model initialization (up to ${STARTUP_TIMEOUT_SEC}s)..."
 
-    local ready=0
-    for i in $(seq 1 30); do
-        sleep 3
+    local elapsed=0
+    while [ $elapsed -lt $STARTUP_TIMEOUT_SEC ]; do
+        sleep 5
+        elapsed=$((elapsed + 5))
+
         if is_healthy; then
-            ready=1
-            break
+            log "vLLM is ONLINE and HEALTHY (took ~${elapsed}s)."
+            return 0
+        fi
+
+        # Check if the process crashed prematurely
+        if ! pgrep -f "vllm" > /dev/null 2>&1 && ! pgrep -f "EngineCore" > /dev/null 2>&1; then
+            log "ERROR: vLLM process exited unexpectedly during startup! Check: $LOG_FILE"
+            return 1
+        fi
+
+        if [ $((elapsed % 30)) -eq 0 ]; then
+            log "Still loading model & initializing KV cache... (${elapsed}s elapsed)"
         fi
     done
 
-    if [ $ready -eq 1 ]; then
-        log "vLLM is ONLINE and HEALTHY (took ~$((i * 3))s)."
-    else
-        log "WARNING: vLLM not ready after 90s. Check logs at: $LOG_FILE"
-    fi
+    log "ERROR: vLLM did not become healthy within ${STARTUP_TIMEOUT_SEC}s. Check: $LOG_FILE"
+    return 1
 }
 
 log "======================================================================"
 log "Starting vLLM Watchdog Supervisor"
 log "Target Health URL: $HEALTH_URL"
 log "Watch Pattern:     dmesg ['$FAULT_PATTERN']"
+log "Startup Budget:    ${STARTUP_TIMEOUT_SEC}s"
 log "======================================================================"
 
 last_fault_count=$(get_fault_count)
