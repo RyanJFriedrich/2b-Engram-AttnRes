@@ -381,16 +381,45 @@ def main():
             }).encode("utf-8")
             req = urllib.request.Request(server_url, data=body, headers={"Content-Type": "application/json"})
             resp_data = None
-            for attempt in range(3):
+            attempt = 0
+            while not STOP:
+                attempt += 1
                 try:
-                    with urllib.request.urlopen(req, timeout=300) as resp:
+                    with urllib.request.urlopen(req, timeout=60) as resp:
                         resp_data = json.loads(resp.read().decode("utf-8"))
                     break
                 except Exception as e:
-                    if attempt == 2:
-                        raise
-                    tqdm.write(f"\n[Warning] Request attempt {attempt + 1} failed: {e}. Retrying in 2s...")
-                    time.sleep(2)
+                    if STOP:
+                        break
+                    tqdm.write(f"\n[Warning] Chunk request failed (attempt {attempt}): {e}")
+                    tqdm.write("          Pausing 30s for Windows/GPU to settle before retry...")
+
+                    # Sleep 30s in 1s increments to stay responsive to SIGINT
+                    for _ in range(30):
+                        if STOP:
+                            break
+                        time.sleep(1)
+                    if STOP:
+                        break
+
+                    # Probe /health until server reports 200 OK
+                    tqdm.write("          Checking server /health...")
+                    while not STOP:
+                        try:
+                            with urllib.request.urlopen(health_url, timeout=5) as h_resp:
+                                if h_resp.status == 200:
+                                    tqdm.write("          [Info] Server /health is 200 OK. Resending chunk...")
+                                    break
+                        except Exception:
+                            pass
+                        for _ in range(5):
+                            if STOP:
+                                break
+                            time.sleep(1)
+
+            if STOP or resp_data is None:
+                tqdm.write("\n[Interrupted] Cleanly exiting chunk loop on signal.")
+                break
 
             dt = time.time() - t0_chunk
             tok_s = (args.seq_len - 1) / dt
