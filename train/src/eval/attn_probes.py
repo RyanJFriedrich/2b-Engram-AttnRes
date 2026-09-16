@@ -35,26 +35,31 @@ def attention_stats(
     beyond_sum = torch.zeros(n_layers)
     beyond_n = torch.zeros(n_layers)
 
+    cursors = [0] * n_layers
+
     def make_probe(i: int):
         def probe(probs: torch.Tensor) -> None:  # [B, H, T, S]
             p = probs.to(torch.float32)
             ent = -(p * (p + 1e-12).log()).sum(-1)  # [B, H, T]
             ent_sum[i] += ent.sum().cpu()
             ent_n[i] += ent.numel()
-            T, S = p.shape[-2], p.shape[-1]
+            Tc, S = p.shape[-2], p.shape[-1]
+            s = cursors[i]
             # Keys for query at row t are positions 0..t (causal); offset = t - j.
-            row = torch.arange(T, device=p.device).unsqueeze(1)
+            row = torch.arange(s, s + Tc, device=p.device).unsqueeze(1)
             col = torch.arange(S, device=p.device).unsqueeze(0)
-            far = (row - col) > beyond  # [T, S]
+            far = (row - col) > beyond  # [Tc, S]
             mass = (p * far).sum(-1)  # [B, H, T]
             beyond_sum[i] += mass.sum().cpu()
             beyond_n[i] += mass.numel()
+            cursors[i] += Tc
         return probe
 
     for i, layer in enumerate(model.model.layers):
         layer.self_attn.probe = make_probe(i)
     try:
         for doc in docs:
+            cursors = [0] * n_layers
             ids = torch.tensor(list(doc), dtype=torch.long, device=device).unsqueeze(0)
             if max_len is not None:
                 ids = ids[:, :max_len]

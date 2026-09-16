@@ -1,0 +1,374 @@
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ pip install transformers==5.7.0 numpy==2.5.1 safetensors==0.7.0 PyYAML==6.0.3 pytest==8.3.0
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Collecting transformers==5.7.0
+  Downloading transformers-5.7.0-py3-none-any.whl (10.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.5/10.5 MB 106.5 MB/s eta 0:00:00
+ERROR: Could not find a version that satisfies the requirement numpy==2.5.1 (from versions: 1.3.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.6.1, 1.6.2, 1.7.0, 1.7.1, 1                                                  .7.2, 1.8.0, 1.8.1, 1.8.2, 1.9.0, 1.9.1, 1.9.2, 1.9.3, 1.10.0.post2, 1.10.1, 1.10.2, 1.10.4, 1.11.0, 1.11.1, 1.11.2, 1.11.3, 1.12.0, 1.12.1, 1.13.0, 1.13.1,                                                   1.13.3, 1.14.0, 1.14.1, 1.14.2, 1.14.3, 1.14.4, 1.14.5, 1.14.6, 1.15.0, 1.15.1, 1.15.2, 1.15.3, 1.15.4, 1.16.0, 1.16.1, 1.16.2, 1.16.3, 1.16.4, 1.16.5, 1.1                                                  6.6, 1.17.0, 1.17.1, 1.17.2, 1.17.3, 1.17.4, 1.17.5, 1.18.0, 1.18.1, 1.18.2, 1.18.3, 1.18.4, 1.18.5, 1.19.0, 1.19.1, 1.19.2, 1.19.3, 1.19.4, 1.19.5, 1.20.0,                                                   1.20.1, 1.20.2, 1.20.3, 1.21.0, 1.21.1, 1.21.2, 1.21.3, 1.21.4, 1.21.5, 1.21.6, 1.22.0, 1.22.1, 1.22.2, 1.22.3, 1.22.4, 1.23.0, 1.23.1, 1.23.2, 1.23.3, 1.2                                                  3.4, 1.23.5, 1.24.0, 1.24.1, 1.24.2, 1.24.3, 1.24.4, 1.25.0, 1.25.1, 1.25.2, 1.26.0, 1.26.1, 1.26.2, 1.26.3, 1.26.4, 2.0.0, 2.0.1, 2.0.2, 2.1.0, 2.1.1, 2.1.                                                  2, 2.1.3, 2.2.0, 2.2.1, 2.2.2, 2.2.3, 2.2.4, 2.2.5, 2.2.6)
+ERROR: No matching distribution found for numpy==2.5.1
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ pip install numpy
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Collecting numpy
+  Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 80.6 MB/s eta 0:00:00
+Installing collected packages: numpy                                                                                                                                                                           WARNING: The scripts f2py and numpy-config are installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed numpy-2.2.6
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ pip install safetensors
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Collecting safetensors
+  Downloading safetensors-0.8.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (516 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 516.0/516.0 KB 23.6 MB/s eta 0:00:00
+Installing collected packages: safetensors
+Successfully installed safetensors-0.8.0
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ pip install PyYAML
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Requirement already satisfied: PyYAML in /usr/lib/python3/dist-packages (5.4.1)
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ pip install pytest
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Collecting pytest
+  Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 386.5/386.5 KB 13.7 MB/s eta 0:00:00
+Collecting exceptiongroup>=1
+  Downloading exceptiongroup-1.3.1-py3-none-any.whl (16 kB)
+Collecting packaging>=22
+  Downloading packaging-26.3-py3-none-any.whl (129 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 130.0/130.0 KB 28.6 MB/s eta 0:00:00
+Collecting tomli>=1
+  Downloading tomli-2.4.1-py3-none-any.whl (14 kB)
+Collecting pygments>=2.7.2
+  Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 26.9 MB/s eta 0:00:00
+Collecting iniconfig>=1.0.1
+  Downloading iniconfig-2.3.0-py3-none-any.whl (7.5 kB)
+Collecting pluggy<2,>=1.5
+  Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Collecting typing-extensions>=4.6.0
+  Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 KB 30.8 MB/s eta 0:00:00
+Installing collected packages: typing-extensions, tomli, pygments, pluggy, packaging, iniconfig, exceptiongroup, pytest
+  WARNING: The script pygmentize is installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts py.test and pytest are installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed exceptiongroup-1.3.1 iniconfig-2.3.0 packaging-26.3 pluggy-1.6.0 pygments-2.21.0 pytest-9.1.1 tomli-2.4.1 typing-extensions-4.16.0
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ git clone https://github.com/RyanJFriedrich/Llama-9b-Trainer.git llama-9b
+Cloning into 'llama-9b'...
+remote: Enumerating objects: 175, done.
+remote: Counting objects: 100% (175/175), done.
+remote: Compressing objects: 100% (144/144), done.
+remote: Total 175 (delta 25), reused 175 (delta 25), pack-reused 0 (from 0)
+Receiving objects: 100% (175/175), 2.03 MiB | 42.40 MiB/s, done.
+Resolving deltas: 100% (25/25), done.
+Ubuntu@0520-dca-csp6bk-prxmx160003:~$ cd llama-9b/
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ hf auth login
+hf: command not found
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ pip install hf
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://mcache-dca.massedcompute.com/simple, https://pypi.org/simple
+Collecting hf
+  Downloading hf-1.29.0-py3-none-any.whl (2.4 kB)
+Collecting huggingface_hub==1.29.0
+  Downloading huggingface_hub-1.29.0-py3-none-any.whl (795 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 795.8/795.8 KB 28.7 MB/s eta 0:00:00
+Collecting tqdm>=4.42.1
+  Downloading tqdm-4.70.0-py3-none-any.whl (80 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.2/80.2 KB 31.7 MB/s eta 0:00:00
+Collecting httpx<1,>=0.23.0
+  Downloading httpx-0.28.1-py3-none-any.whl (73 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 KB 42.3 MB/s eta 0:00:00
+Collecting click<9.0.0,>=8.4.2
+  Downloading click-8.5.0-py3-none-any.whl (125 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 125.3/125.3 KB 74.7 MB/s eta 0:00:00
+Collecting fsspec>=2023.5.0
+  Downloading fsspec-2026.7.0-py3-none-any.whl (206 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 206.6/206.6 KB 54.0 MB/s eta 0:00:00
+Requirement already satisfied: packaging>=20.9 in /home/Ubuntu/.local/lib/python3.10/site-packages (from huggingface_hub==1.29.0->hf) (26.3)
+Collecting hf-xet<2.0.0,>=1.5.2
+  Downloading hf_xet-1.6.0-cp38-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.5 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 82.1 MB/s eta 0:00:00
+Requirement already satisfied: pyyaml>=5.1 in /usr/lib/python3/dist-packages (from huggingface_hub==1.29.0->hf) (5.4.1)
+Collecting filelock>=3.10.0
+  Downloading filelock-3.32.5-py3-none-any.whl (100 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.0/100.0 KB 62.5 MB/s eta 0:00:00
+Requirement already satisfied: typing-extensions>=4.1.0 in /home/Ubuntu/.local/lib/python3.10/site-packages (from huggingface_hub==1.29.0->hf) (4.16.0)
+Collecting httpcore==1.*
+  Downloading httpcore-1.0.9-py3-none-any.whl (78 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 KB 49.3 MB/s eta 0:00:00
+Collecting anyio
+  Downloading anyio-4.15.0-py3-none-any.whl (131 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 131.9/131.9 KB 72.9 MB/s eta 0:00:00
+Requirement already satisfied: certifi in /usr/lib/python3/dist-packages (from httpx<1,>=0.23.0->huggingface_hub==1.29.0->hf) (2020.6.20)
+Requirement already satisfied: idna in /usr/lib/python3/dist-packages (from httpx<1,>=0.23.0->huggingface_hub==1.29.0->hf) (3.3)
+Collecting h11>=0.16
+  Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+Requirement already satisfied: exceptiongroup>=1.0.2 in /home/Ubuntu/.local/lib/python3.10/site-packages (from anyio->httpx<1,>=0.23.0->huggingface_hub==1.2                                                  9.0->hf) (1.3.1)
+Installing collected packages: tqdm, hf-xet, h11, fsspec, filelock, click, httpcore, anyio, httpx, huggingface_hub, hf
+  WARNING: The script tqdm is installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script httpx is installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts hf, huggingface-cli and tiny-agents are installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The script hf is installed in '/home/Ubuntu/.local/bin' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+Successfully installed anyio-4.15.0 click-8.5.0 filelock-3.32.5 fsspec-2026.7.0 h11-0.16.0 hf-1.29.0 hf-xet-1.6.0 httpcore-1.0.9 httpx-0.28.1 huggingface_hu                                                  b-1.29.0 tqdm-4.70.0
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ hf auth login
+hf: command not found
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ nvidia-smi
+Thu Sep  3 04:58:52 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.126.09             Driver Version: 580.126.09     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX PRO 6000 Blac...    On  |   00000000:01:00.0 Off |                    0 |
+| N/A   27C    P8             30W /  600W |       0MiB /  97887MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python3 --version
+Python 3.10.12
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ export PATH="$HOME/.local/bin:$PATH"
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ hf auth login
+? How would you like to log in? Paste an access token
+    To log in, `huggingface_hub` requires a token generated from https://huggingface.co/settings/tokens .
+Enter your token (input will not be visible):
+Token is valid (permission: fineGrained).
+The token `NewToken` has been saved to /home/Ubuntu/.cache/huggingface/stored_tokens
+Your token has been saved to /home/Ubuntu/.cache/huggingface/token
+Login successful.
+The current active token is: `NewToken`
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ nvidia-smi
+Thu Sep  3 05:02:19 2026
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.126.09             Driver Version: 580.126.09     CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA RTX PRO 6000 Blac...    On  |   00000000:01:00.0 Off |                    0 |
+| N/A   28C    P8             30W /  600W |       0MiB /  97887MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python3 --version
+Python 3.10.12
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ which python pytho3
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ which python python3
+/usr/bin/python3
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python3 -c "import torch; print(torch.__version__, torch.cuda.is_available())" 2>&1 | head -2
+df -h . | tail -1
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+/dev/sda2       713G   14G  670G   3% /
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ hf download meta-llama/Meta-Llama-3.1-8B-Instruct --local-dir OriginalModel
+hf download Ouroboros-Research/llama-9b-base-v1 --repo-type model --local-dir exports/llama-9b-base-v1
+hf download Ouroboros-Research/llama-9b-bulk-npz --repo-type dataset --local-dir data_pipeline/bulk_out
+Downloading bytes:                                                                                                                     |  0.00B            S                                                  till waiting to acquire lock on /home/Ubuntu/llama-9b/OriginalModel/.cache/huggingface/.gitignore.lock (elapsed: 0.1 seconds) |  0.00B /  0.00B
+Fetching 17 files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 17/17 [00:44<00:00,  2.60s/it]
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 27.6GB,  477MB/s  ✓                                                   Downloadedion complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 32.1GB / 32.1GB, 1.47GB/s
+  path: /home/Ubuntu/llama-9b/OriginalModel
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 27.6GB,  477MB/s
+Reconstruction complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 32.1GB / 32.1GB, 1.47GB/s
+Fetching 10 files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 10/10 [00:36<00:00,  3.67s/it]
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 15.8GB,  220MB/s  ✓                                                   Downloadedion complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 18.8GB / 18.8GB, 1.14GB/s
+  path: /home/Ubuntu/llama-9b/exports/llama-9b-base-v1
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 15.8GB,  220MB/s
+Reconstruction complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 18.8GB / 18.8GB, 1.14GB/s
+Fetching 83 files: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 83/83 [00:38<00:00,  2.16it/s]
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 15.3GB,  205MB/s  ✓                                                   Downloadedion complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 15.3GB / 15.3GB,  485MB/s
+  path: /home/Ubuntu/llama-9b/data_pipeline/bulk_out
+Download complete: : ██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 15.3GB,  205MB/s
+Reconstruction complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████| 15.3GB / 15.3GB,  485MB/s
+Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ curl -LsSf https://astral.sh/uv/install.sh | sh
+source ~/.bashrc
+uv python install 3.13
+uv venv --python 3.13 ~/venv
+source ~/venv/bin/activate
+echo 'source ~/venv/bin/activate' >> ~/.bashrc
+downloading uv 0.12.9 x86_64-unknown-linux-gnu
+installing to /home/Ubuntu/.local/bin
+  uv
+  uvx
+everything's installed!
+mkdir: cannot create directory ‘/home/Ubuntu/.config/uv’: Permission denied
+ERROR: unable to create receipt directory at /home/Ubuntu/.config/uv
+Installed Python 3.13.15 in 700ms
+ + cpython-3.13.15-linux-x86_64-gnu (python3.13)
+Using CPython 3.13.15
+Creating virtual environment at: /home/Ubuntu/venv
+Activate with: source /home/Ubuntu/venv/bin/activate
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ uv pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu130
+uv pip install transformers==5.7.0 numpy==2.5.1 safetensors==0.7.0 PyYAML==6.0.3 pytest==8.3.0
+Using Python 3.13.15 environment at: /home/Ubuntu/venv
+Resolved 28 packages in 283ms
+Prepared 28 packages in 4.57s
+Installed 28 packages in 78ms
+ + cuda-bindings==13.0.3
+ + cuda-pathfinder==1.6.0
+ + filelock==3.32.3
+ + fsspec==2026.7.0
+ + jinja2==3.1.6
+ + markupsafe==3.0.3
+ + mpmath==1.3.0
+ + networkx==3.6.1
+ + nvidia-cublas==13.1.0.3
+ + nvidia-cuda-cupti==13.0.85
+ + nvidia-cuda-nvrtc==13.0.88
+ + nvidia-cuda-runtime==13.0.96
+ + nvidia-cudnn-cu13==9.15.1.9
+ + nvidia-cufft==12.0.0.61
+ + nvidia-cufile==1.15.1.6
+ + nvidia-curand==10.4.0.35
+ + nvidia-cusolver==12.0.4.66
+ + nvidia-cusparse==12.6.3.3
+ + nvidia-cusparselt-cu13==0.8.0
+ + nvidia-nccl-cu13==2.28.9
+ + nvidia-nvjitlink==13.0.88
+ + nvidia-nvshmem-cu13==3.4.5
+ + nvidia-nvtx==13.0.85
+ + setuptools==78.1.0
+ + sympy==1.14.0
+ + torch==2.10.0+cu130
+ + triton==3.6.0
+ + typing-extensions==4.16.0
+Using Python 3.13.15 environment at: /home/Ubuntu/venv
+Resolved 30 packages in 254ms
+Prepared 27 packages in 181ms
+Installed 27 packages in 23ms
+ + annotated-doc==0.0.5
+ + anyio==4.15.0
+ + certifi==2026.7.22
+ + click==8.5.0
+ + h11==0.16.0
+ + hf-xet==1.6.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + huggingface-hub==1.29.0
+ + idna==3.19
+ + iniconfig==2.3.0
+ + markdown-it-py==4.2.0
+ + mdurl==0.1.2
+ + numpy==2.5.1
+ + packaging==26.3
+ + pluggy==1.6.0
+ + pygments==2.21.0
+ + pytest==8.3.0
+ + pyyaml==6.0.3
+ + regex==2026.9.3
+ + rich==15.0.0
+ + safetensors==0.7.0
+ + shellingham==1.5.4
+ + tokenizers==0.22.2
+ + tqdm==4.70.0
+ + transformers==5.7.0
+ + typer==0.27.2
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_nam                                                  e(0))"
+
+2.10.0+cu130 True NVIDIA RTX PRO 6000 Blackwell Server Edition
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ ls OriginalModel
+config.json             model-00001-of-00004.safetensors  model-00004-of-00004.safetensors  README.md                tokenizer.json
+generation_config.json  model-00002-of-00004.safetensors  model.safetensors.index.json      special_tokens_map.json  USE_POLICY.md
+LICENSE                 model-00003-of-00004.safetensors  original                          tokenizer_config.json
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ ls OriginalModel
+ls exports/llama-9b-base-v1
+ls data_pipeline/bulk_out | wc -l
+config.json             model-00001-of-00004.safetensors  model-00004-of-00004.safetensors  README.md                tokenizer.json
+generation_config.json  model-00002-of-00004.safetensors  model.safetensors.index.json      special_tokens_map.json  USE_POLICY.md
+LICENSE                 model-00003-of-00004.safetensors  original                          tokenizer_config.json
+config.json  engram.safetensors                model-00002-of-00004.safetensors  model-00004-of-00004.safetensors  README.md
+engram.json  model-00001-of-00004.safetensors  model-00003-of-00004.safetensors  model.safetensors.index.json
+82
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ ls exports/llama-9b-base-v1
+config.json  engram.safetensors                model-00002-of-00004.safetensors  model-00004-of-00004.safetensors  README.md
+engram.json  model-00001-of-00004.safetensors  model-00003-of-00004.safetensors  model.safetensors.index.json
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ ls data_pipeline/bulk_out | wc -l
+82
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python -m train.scripts.convert_bulk
+                            [2026-09-03 05:09:41] [INFO] convert_bulk [1/81]: data_pipeline/bulk_out/bulk_00000.npz -> train/data/shards/bulk_00000
+[2026-09-03 05:09:45] [INFO] npz_converter: data_pipeline/bulk_out/bulk_00000.npz -> train/data/shards/bulk_00000: 128 chunks as docs, 1048576 tokens, k=32,                                                   fold_version=v2
+[2026-09-03 05:09:45] [INFO] convert_bulk [2/81]: data_pipeline/bulk_out/bulk_00001.npz -> train/data/shards/bulk_00001
+[2026-09-03 05:09:49] [INFO] npz_converter: data_pipeline/bulk_out/bulk_00001.npz -> train/data/shards/bulk_00001: 128 chunks as docs, 1048576 tokens, k=32,                                                   fold_version=v2
+[2026-09-03 05:09:49] [INFO] convert_bulk [3/81]: data_pipeline/bulk_out/bulk_00002.npz -> train/data/shards/bulk_00002
+[2026-09-03 05:14:39] [INFO] npz_converter: data_pipeline/bulk_out/bulk_00079.npz -> train/data/shards/bulk_00079: 128 chunks as docs, 1048576 tokens, k=32,                                                   fold_version=v2
+
+--- 
+
+Data Trimmed
+
+---
+
+[2026-09-03 05:14:39] [INFO] convert_bulk [81/81]: data_pipeline/bulk_out/bulk_00080.npz -> train/data/shards/bulk_00080
+[2026-09-03 05:14:40] [INFO] npz_converter: data_pipeline/bulk_out/bulk_00080.npz -> train/data/shards/bulk_00080: 41 chunks as docs, 335872 tokens, k=32, f                                                  old_version=v2
+[2026-09-03 05:14:40] [INFO] convert_bulk: 63 converted, 18 already done, 81 total in 3.8 min
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python -m train.scripts.fill_smoke_shards
+[2026-09-03 05:15:21] [INFO] fill_smoke_shards: train/configs/bringup_bf16_smoke.yaml -> 81 shard dirs
+[2026-09-03 05:15:21] [INFO] fill_smoke_shards: train/configs/bringup_fp8_smoke.yaml -> 81 shard dirs
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ python -m train.scripts.preflight --model-config train/configs/model/llama_9b_engram_v1.yaml --min-dis                                                  k-gb 700
+python -m pytest train/tests/test_fp8.py train/tests/test_torch_compile.py -q
+python -m train.scripts.step0_sanity --model-config train/configs/model/llama_9b_engram_v1.yaml
+[2026-09-03 05:15:49] [INFO] preflight [PASS] donor weights: 4 shards, 15.0 GiB, tokenizer present
+[2026-09-03 05:15:49] [INFO] preflight [PASS] GPU: NVIDIA RTX PRO 6000 Blackwell Server Edition, 95.0 GiB VRAM (need >= 90)
+[2026-09-03 05:15:49] [INFO] preflight [FAIL] disk: 587 GiB free at /home/Ubuntu/llama-9b (need >= 700)
+[2026-09-03 05:15:49] [INFO] preflight [PASS] system RAM: 141.6 GiB RAM (need >= 64)
+[2026-09-03 05:15:49] [INFO] preflight [PASS] torch build: torch 2.10.0+cu130, cuda 13.0, bf16 GEMM ok (probe -0.059)
+[2026-09-03 05:15:49] [INFO] preflight [PASS] engram canon: canon verified: 128256 ids, sha256 03833370b174f950...
+[2026-09-03 05:15:49] [INFO] preflight FAIL overall
+.......
+                                                                                                                                                           .                                                                                                                                                                                               [100%]
+===================================================================== warnings summary =====================================================================
+train/tests/test_torch_compile.py: 14 warnings
+  /home/Ubuntu/venv/lib/python3.13/site-packages/torch/jit/_script.py:362: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `to                                                  rch.compile` or `torch.export`.
+    warnings.warn(
+
+train/tests/test_torch_compile.py: 14 warnings
+  /home/Ubuntu/venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:7627: UserWarning:
+  Online softmax is disabled on the fly since Inductor decides to
+  split the reduction. Cut an issue to PyTorch if this is an
+  important use case and you want to speed it up with online
+  softmax.
+
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 28 warnings in 328.08s (0:05:28)
+
+[2026-09-03 05:21:25] [INFO] step0_sanity: config=train/configs/model/llama_9b_engram_v1.yaml device=cuda uniform=11.762 nats
+[2026-09-03 05:21:50] [INFO] engram tables: 6 tables ([((1, 0), 128257), ((1, 1), 128257), ((2, 0), 1048573), ((2, 1), 1048571), ((3, 0), 1048559), ((3, 1),                                                   1048549)]), row_dim=256, canon_sha256=03833370b174f950..., 2173.2 MiB host RAM
+[2026-09-03 05:22:00] [INFO] warm_start: 291/291 donor tensors consumed; 165 new refit params (sink logits + AttnRes) at LOCKED start values; gather layer 3                                                  2 identity-initialized (o_proj/down_proj zeroed)
+[2026-09-03 05:22:00] [INFO] warm start: 291/291 donor tensors, 165 new params
+[2026-09-03 05:22:00] [INFO] engram enabled; zero-init U (I1) at step 0: True
+[2026-09-03 05:22:02] [INFO] probe[0] T=52 CE=1.616 nats
+[2026-09-03 05:22:02] [INFO] probe[1] T=53 CE=1.457 nats
+[2026-09-03 05:22:02] [INFO] probe[2] T=35 CE=3.084 nats
+[2026-09-03 05:22:02] [INFO] step0_sanity: mean CE 2.052 vs uniform 11.762 (pass line 8.821) -> PASS
+[2026-09-03 05:22:27] [INFO] step0_sanity: KL(student||donor) = 0.0664 nats/position (diagnostic, not a gate)
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$
+(venv) Ubuntu@0520-dca-csp6bk-prxmx160003:~/llama-9b$ tmux new -s train

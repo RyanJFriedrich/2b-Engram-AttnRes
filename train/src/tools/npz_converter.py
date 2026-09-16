@@ -85,12 +85,12 @@ def _validate_npz(d: np.lib.npyio.NpzFile, path: Path) -> tuple[int, int]:
 def convert_npz(
     npz_path: Union[str, Path],
     shard_dir: Union[str, Path],
-    teacher_id: str = "meta-llama-3.1-8b-instruct",
-    quantization: str = "Q8_0 GGUF, fork llama-server prompt_logprobs prefill",
-    text_source: str = "wikipedia-20231101.en + fineweb-edu-sample-10BT interleave",
+    teacher_id: str = "olmo-3-7b-instruct-abliterated",
+    quantization: str = "Q8_0 GGUF, fork vllm raw dump",
+    text_source: str = "wikipedia + wikidict",
     data_class: str = "a",
     alpha_override: Optional[float] = None,
-    vocab_size: int = 128256,
+    vocab_size: int = 100278,
     max_chunks: Optional[int] = None,
     log_filename: str = "common.log",
 ) -> dict:
@@ -134,7 +134,13 @@ def convert_npz(
             if L > 1:
                 src_mask = loss_mask[src] == 1
                 ids[:-1][src_mask] = teacher_ids[src][src_mask]
-                probs[:-1][src_mask] = teacher_probs[src][src_mask]
+                p_chunk = teacher_probs[src][src_mask]
+                # Guard against bf16 logsumexp rounding overshoot (> 1.0)
+                row_sums = p_chunk.sum(axis=1, keepdims=True)
+                over = (row_sums > 1.0).squeeze(-1)
+                if over.any():
+                    p_chunk[over] = p_chunk[over] / row_sums[over]
+                probs[:-1][src_mask] = p_chunk
                 mask[:-1] = src_mask.astype(np.uint8)
             writer.add_document(doc_tokens, ids, probs, loss_mask=mask)
 
@@ -149,17 +155,50 @@ def convert_npz(
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    p.add_argument("npz")
-    p.add_argument("shard_dir")
-    p.add_argument("--teacher-id", default="meta-llama-3.1-8b-instruct")
+    p.add_argument("npz", nargs="?", default=None, help="Input .npz file (or omit if using --all)")
+    p.add_argument("shard_dir", nargs="?", default=None, help="Output shard directory")
+    p.add_argument("--all", action="store_true",
+                   help="Batch convert all bulk_*.npz in bulk-dir to shards-dir")
+    p.add_argument("--bulk-dir", default="data_pipeline/bulk_out")
+    p.add_argument("--shards-dir", default="data_pipeline/shards")
+    p.add_argument("--teacher-id", default="allenai/Olmo-3.1-32B-Think")
     p.add_argument("--quantization",
-                   default="Q8_0 GGUF, fork llama-server prompt_logprobs prefill")
+                   default="Q8_0 GGUF, fork vLLM prompt_logprobs prefill")
     p.add_argument("--text-source",
-                   default="wikipedia-20231101.en + fineweb-edu-sample-10BT interleave")
+                   default="wikipedia-20231101.en")
     p.add_argument("--data-class", default="a")
     p.add_argument("--alpha-override", type=float, default=None)
     p.add_argument("--max-chunks", type=int, default=None)
     args = p.parse_args()
+
+    if args.all:
+        bulk_dir = Path(args.bulk_dir)
+        shards_dir = Path(args.shards_dir)
+        shards_dir.mkdir(parents=True, exist_ok=True)
+        npz_files = sorted(bulk_dir.glob("bulk_*.npz"))
+        if not npz_files:
+            log(f"No bulk_*.npz files found under {bulk_dir}", print_console=True)
+            return
+        converted_count = 0
+        for npz_file in npz_files:
+            shard_name = npz_file.stem.replace("bulk_", "shard_")
+            out_target = shards_dir / shard_name
+            if (out_target / "sidecar.json").exists():
+                continue
+            log(f"Batch converting: {npz_file.name} -> {out_target.name}...", print_console=True)
+            convert_npz(
+                npz_file, out_target, teacher_id=args.teacher_id,
+                quantization=args.quantization, text_source=args.text_source,
+                data_class=args.data_class, alpha_override=args.alpha_override,
+                max_chunks=args.max_chunks,
+            )
+            converted_count += 1
+        log(f"Batch conversion complete: {converted_count} new shards converted.", print_console=True)
+        return
+
+    if not args.npz or not args.shard_dir:
+        p.error("the following arguments are required: npz, shard_dir (or pass --all)")
+
     convert_npz(
         args.npz, args.shard_dir, teacher_id=args.teacher_id,
         quantization=args.quantization, text_source=args.text_source,

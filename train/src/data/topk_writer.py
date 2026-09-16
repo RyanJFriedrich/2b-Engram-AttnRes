@@ -72,7 +72,7 @@ class ShardWriter:
         quantization: str = "",
         chat_template_version: str = "",
         fold_version: str = "",
-        vocab_size: int = 128256,
+        vocab_size: int = 100278,
         log_filename: str = "common.log",
         text_source: str = "",
         logit_source: str = "",

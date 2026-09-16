@@ -135,7 +135,7 @@ class Trainer:
         if cfg.torch_compile:
             try:
                 import torch._inductor.config as inductor_config
-                inductor_config.max_autotune = True
+                inductor_config.max_autotune = False
             except Exception:
                 pass
             self._fwd = torch.compile(self.model, dynamic=False)

@@ -717,9 +717,25 @@ class TrainConfig:
             },
             "train",
         )
+        data_shards = None
+        if "data_shards" in d and d["data_shards"] is not None:
+            import glob
+            expanded = []
+            for item in d["data_shards"]:
+                if "*" in item or "?" in item:
+                    from pathlib import Path
+                    matches = sorted([Path(m).as_posix() for m in glob.glob(item)])
+                    if matches:
+                        expanded.extend(matches)
+                    else:
+                        expanded.append(item)
+                else:
+                    expanded.append(item)
+            data_shards = expanded
+
         cfg = cls(
             model=d.get("model", "train/configs/model/llama_8bpp_v1.yaml"),
-            data_shards=list(d["data_shards"]) if "data_shards" in d else None,
+            data_shards=data_shards,
             seq_len=d.get("seq_len", 4096),
             shuffle=d.get("shuffle", True),
             data_seed=d.get("data_seed", 0),

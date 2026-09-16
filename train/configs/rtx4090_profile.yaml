@@ -1,0 +1,35 @@
+# RTX 4090 Local Profiling Config for OLMo-2B
+model: train/configs/model/olmo_2b_v1.yaml
+data_shards:
+  - data_pipeline/shards/shard_00000
+  - data_pipeline/shards/shard_00001
+seq_len: 8192
+shuffle: false
+data_seed: 0
+
+steps: 5
+batch_size: 1
+grad_accum: 4
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 1
+cosine_steps: 5
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+loss_chunk_size: 512
+
+bf16: true
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+out_dir: train/runs/rtx4090_profile
+checkpoint_every: 10
+log_every: 1

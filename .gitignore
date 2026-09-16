@@ -1,19 +1,56 @@
-# This repo tracks ONLY train/ (the harness). Everything else at the repo
-# root — docs/, data_pipeline/, OriginalModel/, QuantizedModel/,
-# LlamaCPPBinaries/, ReferenceCode/, exports/, AGENTS.md, logs — stays local
-# to each machine and moves via HF or direct transfer, never via git.
+# 2B-Engram-AttnRes .gitignore
+
+# Root-level ignore by default
 /*
 !/train/
-!/.gitignore
+!/docs/
+!/data_pipeline/
+!/AGENTS.md
+!/pytest.ini
 !/README.md
+!/.gitignore
 
-# Inside train/: no run outputs, data drop zones, or caches
-# (README placeholders stay tracked).
-__pycache__/
-*.pyc
+# Large binaries, models, and checkpoints (move via HF / storage)
+OriginalModel/
+QuantizedModel/
+LlamaCPPBinaries/
+ReferenceCode/
+exports/
+*.pt
+*.safetensors
+*.gguf
+*.bin
+*.npy
+*.npz
+*.tar*
+*.zip
+
+# Training outputs & logs
 train/runs/*
 !train/runs/README.md
 train/data/bulk_npz/*
 !train/data/bulk_npz/README.md
 train/data/shards/*
 !train/data/shards/README.md
+*.log
+common.log
+
+# Data pipeline downloaded corpora & bulk outputs
+data_pipeline/DownloadedData/
+data_pipeline/bulk_out/
+data_pipeline/bulk_out_test/
+data_pipeline/shards/
+data_pipeline/shards.dryrun/
+data_pipeline/formatted.dryrun/
+data_pipeline/raw.dryrun/
+data_pipeline/raw_inspect/
+data_pipeline/*.jsonl
+data_pipeline/*.npz
+data_pipeline/*.npy
+
+# Python caches & virtual environments
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.remote_box.json

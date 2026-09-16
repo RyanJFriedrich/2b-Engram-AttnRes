@@ -14,7 +14,7 @@ from train.src.tools.shard_converter import convert_jsonl
 
 
 def _write_dense_jsonl(path: Path, k: int, doc_lens: list[int], seed: int = 11,
-                       vocab: int = 128256) -> None:
+                       vocab: int = 100278) -> None:
     rng = np.random.default_rng(seed)
     with path.open("w", encoding="utf-8") as f:
         for d, t in enumerate(doc_lens):
@@ -75,7 +75,7 @@ def test_end_to_end_shard_to_loss(tmp_path):
                   log_filename=str(tmp_path / "c.log"))
 
     seq = next(TopKLoader([tmp_path / "shard"], seq_len=32).iter_sequences())
-    V, D = 128256, 64
+    V, D = 100278, 64
     g = torch.Generator().manual_seed(1)
     hidden = torch.randn(1, 32, D, generator=g, requires_grad=True)
     W = torch.randn(V, D, generator=g) * 0.02

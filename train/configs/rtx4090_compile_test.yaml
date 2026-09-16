@@ -1,0 +1,42 @@
+# Dedicated RTX 4090 torch.compile steady-state evaluation config
+model: train/configs/model/olmo_2b_v1.yaml
+data_shards:
+  - data_pipeline/shards/shard_00000
+  - data_pipeline/shards/shard_00001
+seq_len: 8192
+shuffle: false
+data_seed: 0
+
+steps: 2
+batch_size: 1
+grad_accum: 4
+lr: 0.0002
+min_lr_ratio: 0.1
+warmup_steps: 1
+cosine_steps: 2
+weight_decay: 0.1
+grad_clip: 1.0
+beta1: 0.9
+beta2: 0.95
+
+alpha: 1.0
+temperature: 1.0
+loss_chunk_size: 256
+
+bf16: true
+master_dtype: bf16
+precision: bf16
+torch_compile: true
+mem_debug: false
+autocast_cache: false
+optimizer: adamw8bit
+grad_checkpointing: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+freeze_embeddings: true
+grad_dtype: bf16
+
+out_dir: train/runs/rtx4090_compile_test
+checkpoint_every: 10
+log_every: 1

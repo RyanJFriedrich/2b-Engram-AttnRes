@@ -1,0 +1,37 @@
+# RTX 6000 Ada (48 GB) Training Config for OLMo-2B (Spec v3.0)
+# Architecture: 41 layers, d_model=2048, d_ff=7168, 16 Q heads, 4 KV heads
+# Cold-start interior + SVD down-projected furniture embeddings (frozen)
+model: train/configs/model/olmo_2b_v1.yaml
+data_shards:
+  - data_pipeline/shards/shard_*
+seq_len: 8192
+shuffle: true
+data_seed: 0
+
+# Micro-batch 4 on 48 GB VRAM: 4 * 1 * 8192 = 32,768 tokens per optimizer step
+batch_size: 4
+grad_accum: 1
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 20
+cosine_steps: 732
+steps: 732
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+loss_chunk_size: 1024  # 48 GB headroom allows 1024 chunking, reducing loop overhead
+
+bf16: true
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+out_dir: train/runs/rtx6000_ada_run
+checkpoint_every: 50
+log_every: 1

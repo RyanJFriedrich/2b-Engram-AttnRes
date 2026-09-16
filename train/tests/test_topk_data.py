@@ -10,7 +10,7 @@ from train.src.data.topk_loader import TopKLoader, TopKShard
 from train.src.data.topk_writer import ARRAY_DTYPES, ShardWriter
 
 
-def _doc(rng: np.random.Generator, t: int, k: int, vocab: int = 128256,
+def _doc(rng: np.random.Generator, t: int, k: int, vocab: int = 100278,
          top_mass: float = 0.9):
     """One synthetic document: tokens + teacher top-k with the given mass."""
     tokens = rng.integers(0, vocab, size=t).astype(np.uint32)

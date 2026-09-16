@@ -1,0 +1,37 @@
+# RTX 4090 Training Config for OLMo-2B (~12 hours / 24M tokens)
+# Architecture: 41 layers, d_model=2048, d_ff=7168, 16 Q heads, 4 KV heads
+# Cold-start interior + SVD down-projected furniture embeddings (frozen)
+model: train/configs/model/olmo_2b_v1.yaml
+data_shards:
+  - data_pipeline/shards/shard_*
+seq_len: 8192
+shuffle: true
+data_seed: 0
+
+# 732 steps * 4 grad_accum * 8192 seq_len = 23,986,176 tokens (~12.1 hours @ ~550 tok/s)
+steps: 732
+batch_size: 1
+grad_accum: 4
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 20
+cosine_steps: 732
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+loss_chunk_size: 256  # CRITICAL FOR RTX 4090: Keeps peak VRAM at 18.6 GiB (avoids Windows host RAM paging)
+
+bf16: true
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+out_dir: train/runs/rtx4090_train_24m
+checkpoint_every: 50  # Saves ckpt_stepXX.pt every ~1.64M tokens (~50 minutes)
+log_every: 1          # Prints progress every step (~60s per step)
