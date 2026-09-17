@@ -98,6 +98,7 @@ Run everything from the repo root so `train` imports as a package
 8. AttnRes sources are delta-sums, never stream snapshots; nothing may be added
    to the residual stream without delta-sum registration (I8 — Engram injection depends on this).
 9. Deliberate exclusions: contextual Engram gates, NoPE, full-RoPE globals as default, FP8 weight storage, fp32 AdamW on large runs.
+10. vLLM WSL2 teacher scoring on RTX 4090 requires a HARD MINIMUM `--gpu-memory-utilization 0.91` to initialize dequantized bfloat16 weights. Never lower or suggest lowering below 0.91.
 
 ## Status (2026-09-13, v3.0 OLMo-2B Transition Landed)
 
