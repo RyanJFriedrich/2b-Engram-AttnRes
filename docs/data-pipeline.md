@@ -55,12 +55,16 @@ Interrogate / Ingest  →  Raw JSONL  →  Format & Mask  →  Score (Top-K)  �
 
 ## 4. Dataset Distribution via Hugging Face
 
-Completed top-k shards are synced to [`Ouroboros-Research/Our1-2b-Dataset`](https://huggingface.co/datasets/Ouroboros-Research/Our1-2b-Dataset) manually:
+Compressed distillation archives (`bulk_*.npz` + `manifest.json`) are synced to [`Ouroboros-Research/Our1-2b-Dataset`](https://huggingface.co/datasets/Ouroboros-Research/Our1-2b-Dataset) manually:
 
 ```bash
-# Push shards to Hub:
-huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/shards . --repo-type dataset
+# Push compressed archives to Hub:
+huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" "manifest.json" --repo-type dataset
 
-# Pull shards on training nodes:
-huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/shards --repo-type dataset
+# Pull archives on training nodes:
+huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
+
+# Unpack on node for memory-mapped zero-copy training:
+python -m train.src.tools.npz_converter --all
 ```
+

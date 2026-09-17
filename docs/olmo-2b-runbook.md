@@ -135,22 +135,32 @@ huggingface-cli login
   python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Ouroboros-Research/Our1-2b', local_dir='exports/olmo-2b-base-v1', repo_type='model')"
   ```
 
-### Dataset Shards (`Ouroboros-Research/Our1-2b-Dataset`)
+### Dataset Archives (`Ouroboros-Research/Our1-2b-Dataset`)
 
-- **Upload Shards to Hub:**
+Dataset targets are stored as compressed binary archives (`bulk_*.npz` + `manifest.json`) in `data_pipeline/bulk_out/`.
+
+- **Upload Compressed Archives to Hub:**
   ```bash
-  huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/shards . --repo-type dataset
+  huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" "manifest.json" --repo-type dataset
   ```
   *Alternative (Python one-liner):*
   ```bash
-  python -c "from huggingface_hub import HfApi; HfApi().upload_folder(repo_id='Ouroboros-Research/Our1-2b-Dataset', folder_path='data_pipeline/shards', repo_type='dataset')"
+  python -c "from huggingface_hub import HfApi; HfApi().upload_folder(repo_id='Ouroboros-Research/Our1-2b-Dataset', folder_path='data_pipeline/bulk_out', allow_patterns=['bulk_*.npz', 'manifest.json'], repo_type='dataset')"
   ```
 
-- **Download Shards (on remote server / GPU node):**
+- **Download on Remote GPU Training Node:**
   ```bash
-  huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/shards --repo-type dataset
+  huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
   ```
   *Alternative (Python one-liner):*
   ```bash
-  python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Ouroboros-Research/Our1-2b-Dataset', local_dir='data_pipeline/shards', repo_type='dataset')"
+  python -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='Ouroboros-Research/Our1-2b-Dataset', local_dir='data_pipeline/bulk_out', repo_type='dataset')"
   ```
+
+- **Unpack to Memory-Mapped Training Shards (on node):**
+  Once downloaded, unpack the compressed `.npz` archives into flat `.npy` mmap shards for the training loop:
+  ```bash
+  python -m train.src.tools.npz_converter --all
+  ```
+  *Converts all `data_pipeline/bulk_out/bulk_*.npz` into `data_pipeline/shards/shard_*.npy` ready for `TopKLoader` zero-copy training.*
+
