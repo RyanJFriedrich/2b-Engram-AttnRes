@@ -55,16 +55,17 @@ Interrogate / Ingest  →  Raw JSONL  →  Format & Mask  →  Score (Top-K)  �
 
 ## 4. Dataset Distribution via Hugging Face
 
-Compressed distillation archives (`bulk_*.npz` + `manifest.json`) are synced to [`Ouroboros-Research/Our1-2b-Dataset`](https://huggingface.co/datasets/Ouroboros-Research/Our1-2b-Dataset) manually:
+Compressed distillation archives (`bulk_*.npz` + `manifest.json`) are synced to [`Ouroboros-Research/Our1-2b-Dataset`](https://huggingface.co/datasets/Ouroboros-Research/Our1-2b-Dataset) manually using the `hf` CLI:
 
 ```bash
 # Push compressed archives to Hub:
-huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" "manifest.json" --repo-type dataset
+hf upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" --include "manifest.json" --repo-type dataset
 
 # Pull archives on training nodes:
-huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
+hf download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
 
 # Unpack on node for memory-mapped zero-copy training:
 python -m train.src.tools.npz_converter --all
 ```
+
 

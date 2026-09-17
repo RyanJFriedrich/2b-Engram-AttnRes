@@ -108,18 +108,18 @@ python -m train.scripts.train_phase0 \
 
 ## 5. Hugging Face Hub Operations (Manual)
 
-All heavy models and dataset shards are tracked off-git via Hugging Face.
+All heavy models and dataset shards are tracked off-git via Hugging Face using the modern `hf` CLI.
 
 ### Authentication
 ```bash
-huggingface-cli login
+hf auth login
 ```
 
 ### Model Checkpoint (`Ouroboros-Research/Our1-2b`)
 
 - **Upload Base Checkpoint to Hub:**
   ```bash
-  huggingface-cli upload Ouroboros-Research/Our1-2b exports/olmo-2b-base-v1 . --repo-type model
+  hf upload Ouroboros-Research/Our1-2b exports/olmo-2b-base-v1 . --repo-type model
   ```
   *Alternative (Python one-liner):*
   ```bash
@@ -128,7 +128,7 @@ huggingface-cli login
 
 - **Download Base Checkpoint (on remote server / GPU node):**
   ```bash
-  huggingface-cli download Ouroboros-Research/Our1-2b --local-dir exports/olmo-2b-base-v1 --repo-type model
+  hf download Ouroboros-Research/Our1-2b --local-dir exports/olmo-2b-base-v1 --repo-type model
   ```
   *Alternative (Python one-liner):*
   ```bash
@@ -141,7 +141,7 @@ Dataset targets are stored as compressed binary archives (`bulk_*.npz` + `manife
 
 - **Upload Compressed Archives to Hub:**
   ```bash
-  huggingface-cli upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" "manifest.json" --repo-type dataset
+  hf upload Ouroboros-Research/Our1-2b-Dataset data_pipeline/bulk_out . --include "bulk_*.npz" --include "manifest.json" --repo-type dataset
   ```
   *Alternative (Python one-liner):*
   ```bash
@@ -150,7 +150,7 @@ Dataset targets are stored as compressed binary archives (`bulk_*.npz` + `manife
 
 - **Download on Remote GPU Training Node:**
   ```bash
-  huggingface-cli download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
+  hf download Ouroboros-Research/Our1-2b-Dataset --local-dir data_pipeline/bulk_out --repo-type dataset
   ```
   *Alternative (Python one-liner):*
   ```bash
