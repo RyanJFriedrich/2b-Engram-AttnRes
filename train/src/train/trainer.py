@@ -410,6 +410,16 @@ class Trainer:
                 if self.engram_cfg is not None:
                     tel = self.row_optimizer.pop_telemetry()
                     eng = f" eng_round {tel['engram_bf16_rounding_loss']:.3f}"
+                    if hasattr(self.model.engram, "pop_telemetry"):
+                        tel_readout = self.model.engram.pop_telemetry()
+                        if "engram_attn_entropy" in tel_readout:
+                            eng += f" eng_H {tel_readout['engram_attn_entropy']:.3f}"
+                        if "engram_act" in tel_readout:
+                            eng += f" eng_act {tel_readout['engram_act']:.3f}"
+                        if "engram_act_mid" in tel_readout:
+                            eng += f" eng_act_mid {tel_readout['engram_act_mid']:.3f}"
+                        elif "engram_H_mid" in tel_readout:
+                            eng += f" eng_H_mid {tel_readout['engram_H_mid']:.3f}"
                 mem = ""
                 if cfg.mem_debug and self.device == "cuda":
                     mem = (f" mem_alloc {torch.cuda.memory_allocated() / 2**30:.2f}GiB"
@@ -481,5 +491,10 @@ class Trainer:
             self.step_time_ema = telem.get("step_time_ema")
             self.total_hw_tokens = telem.get("total_hw_tokens", 0)
             self.total_loss_tokens = telem.get("total_loss_tokens", 0)
+        del ckpt
+        import gc
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
         log(f"checkpoint loaded: {path} (resuming at step {self.step})",
             filename=self.log_file, print_console=True)

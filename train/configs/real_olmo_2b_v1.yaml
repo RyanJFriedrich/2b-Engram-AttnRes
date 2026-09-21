@@ -2,7 +2,12 @@
 # Architecture: 41 layers, d_model=2048, d_ff=7168, 16 Q heads, 4 KV heads
 # Cold-start interior + SVD down-projected furniture embeddings (frozen)
 model: train/configs/model/olmo_2b_v1.yaml
-data_shards: []            # fill with converted shards
+data_shards:
+  - train/data/shards/olmo_shard_00141
+  - train/data/shards/olmo_shard_00142
+  - train/data/shards/olmo_shard_00143
+  - train/data/shards/olmo_shard_00144
+  - train/data/shards/olmo_shard_00145
 seq_len: 8192
 shuffle: true
 data_seed: 0
@@ -31,5 +36,5 @@ init: prebuilt
 prebuilt_path: exports/olmo-2b-base-v1
 
 out_dir: train/runs/real_olmo_2b_v1
-checkpoint_every: 100
-log_every: 5
+checkpoint_every: 10
+log_every: 1

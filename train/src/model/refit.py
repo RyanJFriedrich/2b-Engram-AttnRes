@@ -314,10 +314,10 @@ class RefitModel(nn.Module):
         self.engram: Optional[nn.Module] = None
         self.engram_tables = None
         if cfg.engram.enabled:
-            from train.src.engram.readout import EngramReadout
+            from train.src.engram.readout import build_engram_readout
             from train.src.engram.tables import EngramTables
 
-            self.engram = EngramReadout(cfg.engram, cfg.hidden_size, cfg.rms_norm_eps)
+            self.engram = build_engram_readout(cfg.engram, cfg.hidden_size, cfg.rms_norm_eps)
             self.engram_tables = EngramTables(cfg.engram, cfg.vocab_size)
 
         # SWA theta-anneal ablation endpoints (spec §7.2 tooling; unused in
@@ -511,7 +511,7 @@ class RefitModel(nn.Module):
             # addition is delta-sum registered, so block-1's AttnRes source
             # includes the injection exactly).
             if self.engram is not None and i == self.refit_config.engram.injection_point:
-                delta = self.engram(engram)
+                delta = self.engram(engram, h)
                 h = h + delta
                 partial = partial + delta
 

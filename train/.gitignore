@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+runs/*
+!runs/README.md
+data/bulk_npz/*
+!data/bulk_npz/README.md
+data/shards/*
+!data/shards/README.md
+*.pt
+*.safetensors
+*.bin
+*.log
+common.log
+.pytest_cache/

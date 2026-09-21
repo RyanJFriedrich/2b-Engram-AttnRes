@@ -43,12 +43,13 @@ ROW_INIT_LOW, ROW_INIT_HIGH = -0.01, 0.01  # annex A1.5
 class GatherBatch:
     """One batch's staged Engram rows + the bookkeeping the optimizer needs.
 
-    rows[i]    : staged unique rows for table_keys[i], [U_i, row_dim], on
-                 device; the autograd leaf when requires_grad was set.
-    inverse[i]: [B*T] long on device — position -> its slot in rows[i].
-    uniq[i]   : [U_i] np.int64 host — which host rows are staged.
-    valid     : [B, T, n_orders] bool on device — boundary mask (addressing.py).
-    shape     : (B, T).
+    rows[i]        : staged unique rows for table_keys[i], [U_i, row_dim], on
+                     device; the autograd leaf when requires_grad was set.
+    inverse[i]    : [B*T] long on device — position -> its slot in rows[i].
+    uniq[i]       : [U_i] np.int64 host — which host rows are staged.
+    valid         : [B, T, n_orders] bool on device — boundary mask (addressing.py).
+    shape         : (B, T).
+    touch_counts  : Optional list of [U_i] int32 on device — touch frequency per staged row.
     """
 
     table_keys: list[tuple[int, int]]
@@ -58,6 +59,7 @@ class GatherBatch:
     valid: torch.Tensor
     shape: tuple[int, int]
     addressed: dict = field(default_factory=dict)  # (idx, valid) host copies
+    touch_counts: Optional[list[torch.Tensor]] = None
 
     def grads(self) -> list[Optional[np.ndarray]]:
         """Host fp32 grads per table ([U_i, row_dim]) or None if untouched."""
@@ -158,12 +160,15 @@ class EngramTables:
         rows_staged: list[torch.Tensor] = []
         inverse: list[torch.Tensor] = []
         uniqs: list[np.ndarray] = []
+        touch_counts: list[torch.Tensor] = []
         for ki, key in enumerate(self.table_keys):
             n, k = key
             oi = self.cfg.orders.index(n)
             flat = idx[:, :, oi, k].reshape(-1).astype(np.int64)
             uniq, inv = np.unique(flat, return_inverse=True)
             self.touch[key][uniq] += 1
+            tc = torch.from_numpy(self.touch[key][uniq].astype(np.int32)).to(device)
+            touch_counts.append(tc)
             staged = self.rows[key][torch.from_numpy(uniq)].to(device)
             if requires_grad:
                 staged = staged.requires_grad_(True)
@@ -178,6 +183,7 @@ class EngramTables:
             valid=torch.from_numpy(valid).to(device),
             shape=(B, T),
             addressed={"idx": idx, "valid": valid},
+            touch_counts=touch_counts,
         )
 
     def gather(

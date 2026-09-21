@@ -53,4 +53,7 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+
+# Dev Ops & Remote Machine Management (off-git)
 .remote_box.json
+ops/

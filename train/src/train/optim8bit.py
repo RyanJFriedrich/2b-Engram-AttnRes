@@ -97,3 +97,25 @@ class AdamW8bit(Optimizer):
                 pf.add_(update, alpha=-lr)
                 p.copy_(pf.reshape(p.shape).to(p.dtype))
         return loss
+
+    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
+        """Load state dict while preserving true 8-bit quantized dtypes.
+
+        PyTorch's default Optimizer.load_state_dict automatically casts all state
+        tensors to param.dtype (e.g. bfloat16), which doubles optimizer memory
+        (int8 -> bf16 = +4 GB VRAM) and corrupts block dequantization math.
+        """
+        super().load_state_dict(state_dict)
+        for group in self.param_groups:
+            for p in group["params"]:
+                st = self.state.get(p)
+                if not st:
+                    continue
+                if "q_m" in st and isinstance(st["q_m"], torch.Tensor):
+                    st["q_m"] = st["q_m"].to(dtype=torch.int8, device=p.device)
+                if "s_m" in st and isinstance(st["s_m"], torch.Tensor):
+                    st["s_m"] = st["s_m"].to(dtype=torch.float32, device=p.device)
+                if "q_r" in st and isinstance(st["q_r"], torch.Tensor):
+                    st["q_r"] = st["q_r"].to(dtype=torch.int8, device=p.device)
+                if "s_r" in st and isinstance(st["s_r"], torch.Tensor):
+                    st["s_r"] = st["s_r"].to(dtype=torch.float32, device=p.device)

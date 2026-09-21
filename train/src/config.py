@@ -291,12 +291,28 @@ class EngramConfig:
     canon_path: str = "train/src/engram/assets/canon_llama31_v1.npy"
     canon_sha256: str = ""  # pinned after the canon build; verified at table build
     lr_mult: float = 5.0  # annex A1.7: rows LR = lr_mult x base LR, WD 0
+    readout: str = "linear"  # "linear" | "kv" / "kv_sigmoid" (independent sigmoid) | "kv_softmax" (joint softmax)
+    key_dim: Optional[int] = None
+    val_dim: Optional[int] = None
+    softcap: Optional[float] = None
+    temperature: float = 1.0
 
     def __post_init__(self) -> None:
         if self.orders is None:
             self.orders = [1, 2, 3]
         if self.rows_per_head is None:
             self.rows_per_head = {2: [1048573, 1048571], 3: [1048559, 1048549]}
+        if self.readout in ("kv", "kv_sigmoid", "kv_softmax"):
+            if self.key_dim is None:
+                self.key_dim = self.row_dim // 2
+            if self.val_dim is None:
+                self.val_dim = self.row_dim - self.key_dim
+            if self.key_dim + self.val_dim != self.row_dim:
+                raise ValueError(
+                    f"engram.row_dim ({self.row_dim}) must equal key_dim ({self.key_dim}) + val_dim ({self.val_dim})"
+                )
+            if self.softcap is None:
+                self.softcap = 8.0
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "EngramConfig":
@@ -304,7 +320,8 @@ class EngramConfig:
             d,
             {"enabled", "orders", "heads_per_order", "row_dim", "rows_per_head",
              "injection_point", "canonical_compression", "canon_path",
-             "canon_sha256", "lr_mult"},
+             "canon_sha256", "lr_mult", "readout", "key_dim", "val_dim",
+             "softcap", "temperature"},
             "engram",
         )
         rph = d.get("rows_per_head")
@@ -315,21 +332,32 @@ class EngramConfig:
             for k, v in rph.items():
                 vv = v if isinstance(v, list) else [v]
                 parsed_rph[int(k)] = [int(x) for x in vv]
+        row_dim = d.get("row_dim", 256)
+        key_dim = d.get("key_dim", None)
+        val_dim = d.get("val_dim", None)
+        readout = d.get("readout", "linear")
+        softcap = d.get("softcap", 8.0 if readout in ("kv", "kv_sigmoid", "kv_softmax") else None)
+        temperature = float(d.get("temperature", 1.0))
         return cls(
             enabled=d.get("enabled", False),
             orders=[int(o) for o in d["orders"]] if "orders" in d else None,
             heads_per_order=d.get("heads_per_order", 2),
-            row_dim=d.get("row_dim", 256),
+            row_dim=row_dim,
             rows_per_head=parsed_rph,
             injection_point=d.get("injection_point", 3),
             canonical_compression=d.get("canonical_compression", True),
             canon_path=d.get("canon_path", cls.canon_path),
             canon_sha256=d.get("canon_sha256", ""),
             lr_mult=d.get("lr_mult", 5.0),
+            readout=readout,
+            key_dim=key_dim,
+            val_dim=val_dim,
+            softcap=softcap,
+            temperature=temperature,
         )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d: dict[str, Any] = {
             "enabled": self.enabled,
             "orders": list(self.orders),
             "heads_per_order": self.heads_per_order,
@@ -341,8 +369,27 @@ class EngramConfig:
             "canon_sha256": self.canon_sha256,
             "lr_mult": self.lr_mult,
         }
+        if self.readout != "linear":
+            d["readout"] = self.readout
+            if self.key_dim is not None:
+                d["key_dim"] = self.key_dim
+            if self.val_dim is not None:
+                d["val_dim"] = self.val_dim
+            if self.softcap is not None:
+                d["softcap"] = self.softcap
+            if self.temperature != 1.0:
+                d["temperature"] = self.temperature
+        return d
 
     def validate(self) -> None:
+        if self.readout not in ("linear", "kv", "kv_sigmoid", "kv_softmax"):
+            raise ValueError(
+                f"engram.readout must be 'linear', 'kv', 'kv_sigmoid', or 'kv_softmax', got {self.readout!r}"
+            )
+        if self.readout in ("kv", "kv_sigmoid", "kv_softmax") and self.key_dim + self.val_dim != self.row_dim:
+            raise ValueError(
+                f"engram.row_dim ({self.row_dim}) must equal key_dim ({self.key_dim}) + val_dim ({self.val_dim})"
+            )
         if not self.orders or sorted(set(self.orders)) != sorted(self.orders):
             raise ValueError(f"engram.orders must be unique, got {self.orders}")
         if any(o < 1 for o in self.orders):

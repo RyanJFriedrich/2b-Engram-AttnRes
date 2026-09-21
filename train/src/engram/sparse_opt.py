@@ -79,6 +79,7 @@ class SparseRowAdamW8bit:
             nblocks = (n + BLOCK - 1) // BLOCK
             st = {
                 "step": 0,
+                "row_step": torch.zeros((self.tables.moduli[key],), dtype=torch.uint8),
                 "q_m": torch.zeros((nblocks, BLOCK), dtype=torch.int8),
                 "s_m": torch.full((nblocks,), 1e-12 / 127.0),
                 "q_r": torch.zeros((nblocks, BLOCK), dtype=torch.int8),
@@ -133,6 +134,12 @@ class SparseRowAdamW8bit:
             old_bf16 = self.tables.rows[key][rows_t]
             old = old_bf16.to(torch.float32)
 
+            # Per-row step tracking (uint8 capped at 255): avoids the ~3.16x
+            # first-touch overshoot caused by global-step bias correction.
+            r_steps = st["row_step"][rows_t].to(torch.int32) + 1  # [Unz]
+            b1_corr = (1.0 - beta1 ** r_steps.float()).unsqueeze(1)  # [Unz, 1]
+            b2_corr = (1.0 - beta2 ** r_steps.float()).sqrt().unsqueeze(1)  # [Unz, 1]
+
             # Affected blocks only: rows are block-aligned (row_dim | BLOCK).
             starts = uniq * D
             offs = torch.from_numpy((starts % BLOCK)[:, None] + np.arange(D))  # [Unz, D]
@@ -149,9 +156,12 @@ class SparseRowAdamW8bit:
             v_e = r_e.square() * beta2 + g.square() * (1 - beta2)
             r_e = v_e.sqrt()
 
-            m_hat = m_e / (1 - beta1**t)
-            r_hat = r_e / math.sqrt(1 - beta2**t)
+            m_hat = m_e / b1_corr
+            r_hat = r_e / b2_corr
             new = old - lr * m_hat / (r_hat + self.eps)  # WD = 0 (annex A1.7)
+
+            # Update per-row step count, clamping at 255
+            st["row_step"][rows_t] = torch.clamp(r_steps, max=255).to(torch.uint8)
 
             m[inv_t.unsqueeze(1), offs] = m_e
             r[inv_t.unsqueeze(1), offs] = r_e
@@ -184,4 +194,7 @@ class SparseRowAdamW8bit:
     def load_state_dict(self, sd: dict[str, Any]) -> None:
         for ks, st in sd.items():
             n, k = (int(x) for x in ks.split(","))
+            if "row_step" not in st:
+                M = self.tables.moduli[(n, k)]
+                st["row_step"] = torch.zeros((M,), dtype=torch.uint8)
             self.state[(n, k)] = st

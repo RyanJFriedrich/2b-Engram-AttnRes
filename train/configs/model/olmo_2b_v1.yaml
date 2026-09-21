@@ -119,9 +119,14 @@ engram:
   orders: [1, 2, 3]
   heads_per_order: 2
   row_dim: 256
-  rows_per_head: { 2: [1048573, 1048571], 3: [1048559, 1048549] }
+  rows_per_head: { 2: [4194301, 4194287], 3: [4194277, 4194271] }
   injection_point: 3        # output of layer 3 (Block 1 Global)
   canonical_compression: true
   canon_path: train/src/engram/assets/canon_olmo_v1.npy
   canon_sha256: "8bb4fa0dff964ec53035255a27c3dc6b635a4709aabda449105828ad4c6409ad"
   lr_mult: 5.0
+  readout: kv
+  key_dim: 128
+  val_dim: 128
+  softcap: 8.0
+  temperature: 1.0
