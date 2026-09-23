@@ -168,6 +168,7 @@ def main() -> None:
                    default="wikipedia-20231101.en")
     p.add_argument("--data-class", default="a")
     p.add_argument("--alpha-override", type=float, default=None)
+    p.add_argument("--limit", type=int, default=None, help="Max number of new shards to convert when using --all")
     p.add_argument("--max-chunks", type=int, default=None)
     args = p.parse_args()
 
@@ -181,6 +182,8 @@ def main() -> None:
             return
         converted_count = 0
         for npz_file in npz_files:
+            if args.limit is not None and converted_count >= args.limit:
+                break
             shard_name = npz_file.stem.replace("bulk_", "shard_")
             out_target = shards_dir / shard_name
             if (out_target / "sidecar.json").exists():

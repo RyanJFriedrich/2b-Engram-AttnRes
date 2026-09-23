@@ -1,0 +1,44 @@
+# RTX 6000 Pro Blackwell (96 GB, SM120) Token-Maxed FP8 Config
+# Architecture: 41 layers, d_model=2048, d_ff=7168, 16 Q heads, 4 KV heads
+# Target Hardware: RTX 6000 Pro Blackwell (96 GB GDDR7) with native SM120 FP8 GEMM (_scaled_mm)
+
+model: train/configs/model/olmo_2b_blackwell.yaml
+data_shards:
+  - data_pipeline/shards/shard_*
+seq_len: 8192
+shuffle: true
+data_seed: 0
+
+# Full Micro-batch 4 (zero accumulation loop overhead):
+batch_size: 4
+grad_accum: 1
+
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 20
+cosine_steps: 12735
+steps: 12735
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+
+loss_chunk_size: 2048
+mem_debug: true
+
+bf16: true
+precision: fp8
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+torch_compile: true
+
+out_dir: train/runs/blackwell_6000_fp8
+checkpoint_every: 1000
+log_every: 1

@@ -50,6 +50,7 @@ class EngramLinearReadout(nn.Module):
         for n in self.orders:
             nn.init.zeros_(self.proj[str(n)].weight)  # I1: zero-init U
 
+    @torch.compiler.disable
     def forward(self, gb: GatherBatch, h: Optional[torch.Tensor] = None) -> torch.Tensor:
         """GatherBatch -> injection delta [B, T, d_model]. Accepts optional h for interface parity."""
         B, T = gb.shape
@@ -180,6 +181,7 @@ class EngramKVReadout(nn.Module):
             "high": [],
         }
 
+    @torch.compiler.disable
     def forward(self, gb: GatherBatch, h: Optional[torch.Tensor] = None) -> torch.Tensor:
         """Context-conditioned cross-attention injection delta [B, T, d_model]."""
         B, T = gb.shape
@@ -258,6 +260,8 @@ class EngramKVReadout(nn.Module):
         valid: torch.Tensor,
         gb: GatherBatch,
     ) -> None:
+        if torch.compiler.is_compiling():
+            return
         B, T, K = alpha.shape
         v_float = valid.float()
         n_valid = v_float.sum(dim=-1).clamp_min(1.0)  # [B, T]

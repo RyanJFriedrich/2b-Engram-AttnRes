@@ -1,0 +1,42 @@
+# RTX 6000 Pro Blackwell (96 GB, SM120) Stress Probe: batch_size=8
+# Total tokens per step: 8 * 8192 = 65,536 tokens/step
+# Evaluates GPU compute saturation and VRAM allocation ceiling at BS=8
+
+model: train/configs/model/olmo_2b_blackwell.yaml
+data_shards:
+  - data_pipeline/shards/shard_*
+seq_len: 8192
+shuffle: true
+data_seed: 0
+
+batch_size: 8
+grad_accum: 1
+
+lr: 2.0e-4
+min_lr_ratio: 0.1
+warmup_steps: 20
+cosine_steps: 6367
+steps: 6367
+weight_decay: 0.1
+grad_clip: 1.0
+
+alpha: 1.0
+temperature: 1.0
+
+loss_chunk_size: 2048
+mem_debug: true
+
+bf16: true
+master_dtype: bf16
+optimizer: adamw8bit
+grad_checkpointing: true
+freeze_embeddings: true
+seed: 0
+init: prebuilt
+prebuilt_path: exports/olmo-2b-base-v1
+
+torch_compile: true
+
+out_dir: train/runs/blackwell_bs8
+checkpoint_every: 1000
+log_every: 1

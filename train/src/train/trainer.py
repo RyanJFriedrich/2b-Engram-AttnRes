@@ -460,7 +460,9 @@ class Trainer:
             # resume-safe state, alongside model/optimizer/RNG/cursor.
             ckpt["engram_tables"] = self.model.engram_tables.state_dict()
             ckpt["engram_row_opt"] = self.row_optimizer.state_dict()
-        torch.save(ckpt, path)
+        tmp_path = path.with_suffix(".tmp")
+        torch.save(ckpt, tmp_path)
+        tmp_path.replace(path)
         log(f"checkpoint saved: {path} (step {self.step})", filename=self.log_file,
             print_console=True)
         return path

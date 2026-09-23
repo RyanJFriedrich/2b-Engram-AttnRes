@@ -70,13 +70,14 @@ class _FusedKDLoss(torch.autograd.Function):
         ctx.save_for_backward(hidden, weight, topk_idx, topk_w, tail_w, gold, mask)
 
         total = torch.zeros((), dtype=torch.float32, device=hidden.device)
+        w_f32 = weight.to(torch.float32) if weight.dtype != torch.float32 else weight
         with torch.no_grad():
             for s in range(0, N, chunk_size):
                 e = min(s + chunk_size, N)
                 m = mask[s:e].to(torch.float32)
                 if not m.any():
                     continue
-                z = (hidden[s:e].to(torch.float32) @ weight.to(torch.float32).T) / temperature
+                z = (hidden[s:e].to(torch.float32) @ w_f32.t()) / temperature
                 losses = _chunk_losses(z, topk_idx[s:e], topk_w[s:e].to(torch.float32),
                                        tail_w[s:e].to(torch.float32), gold[s:e], alpha)
                 total += (losses * m).sum()
@@ -94,13 +95,15 @@ class _FusedKDLoss(torch.autograd.Function):
         grad_w = torch.zeros_like(weight, dtype=torch.float32) if needs_w_grad else None
         scale = grad_out.to(torch.float32) / temperature
 
+        w_f32 = weight.to(torch.float32) if weight.dtype != torch.float32 else weight
+
         for s in range(0, N, chunk_size):
             e = min(s + chunk_size, N)
             m = mask[s:e].to(torch.float32)
             if not m.any():
                 continue
             h_c = hidden[s:e].to(torch.float32)
-            z = (h_c @ weight.to(torch.float32).T) / temperature
+            z = (h_c @ w_f32.t()) / temperature
             p = torch.softmax(z, dim=-1)
             k = topk_idx.shape[1]
 
@@ -127,7 +130,7 @@ class _FusedKDLoss(torch.autograd.Function):
                 dz = alpha * dz
 
             dz.mul_(m.unsqueeze(1)).mul_(scale)
-            grad_h[s:e] = (dz @ weight.to(torch.float32)).to(hidden.dtype)
+            grad_h[s:e] = (dz @ w_f32).to(hidden.dtype)
             if needs_w_grad:
                 grad_w += dz.T @ h_c
 
